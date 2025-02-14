@@ -10,7 +10,7 @@ x = np.array([[-2,1,1],[-2,-1,-1],[2,1,-1], [2,-1,1]])/np.sqrt(6)
 
 coord = np.array([x,y,z])
 
-pyrochore_unit_cell = np.array([[-1,-1,-1],[-1,1,1],[1,-1,1],[1,1,-1]])/8
+pyrochore_unit_cell = np.array([[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]])/8
 basis = np.array([[0,1,1],[1,0,1],[1,1,0]])/2
 BasisBZA = np.array([2*np.pi*np.array([-1,1,1]),2*np.pi*np.array([1,-1,1]),2*np.pi*np.array([1,1,-1])])
 
@@ -537,7 +537,7 @@ def pedantic_one_body_correlation(Observables, filename,observablename):
 ##Finite temperature using TPQ
 
 def finite_temp_observables(Observables, POT, steps, num_sets, filename, observablename):
-    temp = np.loadtxt(dir+"/output/Flct_rand0.dat")[:,0][19::steps]
+    temp = np.loadtxt(dir+"/output/Flct_rand0.dat")[:,0][20::steps]
     temp = 1/temp
     def SSSFhelper(i, set=0):
         twobody = np.loadtxt(dir+"/output/zvo_cisajscktalt_set"+str(set)+"step"+str(i)+".dat", dtype=np.float64)
@@ -555,9 +555,9 @@ def finite_temp_observables(Observables, POT, steps, num_sets, filename, observa
     for i in range(4):
         for j in range(4):
             plt.plot(temp, SSSF[:,i,j])
-            plt.xlabel(r"$\beta$")
+            plt.xlabel(r"$T$")
             plt.xscale("log")
-            plt.ylabel(r"$"+observablename+"|_{\Gamma=(0,0,0)}$")
+            plt.ylabel(r"$"+observablename+"$")
             np.savetxt(dir+filename+str(i)+str(j)+".dat", SSSF[:,i,j])
             plt.savefig(dir+filename+str(i)+str(j)+".pdf")
             plt.clf()
@@ -566,16 +566,18 @@ def finite_temp_observables(Observables, POT, steps, num_sets, filename, observa
     SSSF = contract('iab->i',SSSF)
     np.savetxt(dir+filename+"total.dat", SSSF)
     plt.plot(temp, SSSF)
-    plt.xlabel(r"$\beta$")
+    plt.xlabel(r"$T$")
     plt.xscale("log")
-    plt.ylabel(r"$"+observablename+"|_{\Gamma=(0,0,0)}$")
+    plt.ylabel(r"$"+observablename+"$")
     plt.savefig(dir+filename+"total.pdf")
     plt.clf()
     plt.close()
 
 
-finite_temp_observables(Szz, np.array([[0,0,0]]), 20, 5, "/Szz_finite_temp/", "\mathcal{S}^{zz}")
-
+finite_temp_observables(Szz, np.array([[0,0,0]]), 20, 1, "/Szz_finite_temp_gamma/", "\mathcal{S}^{zz}")
+finite_temp_observables(Szz, np.array([[0,0,2*np.pi]]), 20, 1, "/Szz_finite_temp_X/", "\mathcal{S}^{zz}")
+finite_temp_observables(Spm, np.array([[0,0,0]]), 20, 1, "/Spm_finite_temp_gamma/", "\mathcal{S}^{\pm}")
+finite_temp_observables(Spm, np.array([[0,0,2*np.pi]]), 20, 1, "/Spm_finite_temp_X/", "\mathcal{S}^{\pm}")
 ##Finite temperature calculation. Requires operator acting on eigenstates.
 ##In HPhi, first of all, eigenvec has dimension 2^N. In HPhi, it is enumerated by permuting the last site first i.e.
 ##0 0 0 0 0 0

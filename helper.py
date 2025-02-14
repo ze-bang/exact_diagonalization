@@ -5,13 +5,13 @@ z = np.array([np.array([1,1,1])/np.sqrt(3), np.array([1,-1,-1])/np.sqrt(3), np.a
 
 def indices(i,j,k,u,d1, d2, d3):
     if u == 0:
-        return np.array([[i, j, k, 1], [i, j, k, 2], [i, j, k, 3], [np.mod(i-1, d1), j, k, 1], [i, np.mod(j-1, d2), k, 2], [i, j, np.mod(k-1, d3), 3]])
+        return np.array([[i, j, k, 1], [i, j, k, 2], [i, j, k, 3], [np.mod(i+1, d1), j, k, 1], [i, np.mod(j+1, d2), k, 2], [i, j, np.mod(k+1, d3), 3]])
     elif u == 1:
-        return np.array([[i, j, k, 0], [i, j, k, 2], [i, j, k, 3], [np.mod(i+1, d1), j, k, 0],[np.mod(i+1, d1), np.mod(j-1, d2), k, 2], [np.mod(i+1, d1), j, np.mod(k-1, d3), 3]])
+        return np.array([[i, j, k, 0], [i, j, k, 2], [i, j, k, 3], [np.mod(i-1, d1), j, k, 0],[np.mod(i-1, d1), np.mod(j+1, d2), k, 2], [np.mod(i-1, d1), j, np.mod(k+1, d3), 3]])
     elif u == 2:
-        return np.array([[i, j, k, 0], [i, j, k, 1], [i, j, k, 3], [i, np.mod(j+1, d2), k, 0], [np.mod(i-1, d1), np.mod(j+1, d2), k, 1], [i, np.mod(j+1, d2), np.mod(k-1, d3), 3]])
+        return np.array([[i, j, k, 0], [i, j, k, 1], [i, j, k, 3], [i, np.mod(j-1, d2), k, 0], [np.mod(i+1, d1), np.mod(j-1, d2), k, 1], [i, np.mod(j+1, d2), np.mod(k-1, d3), 3]])
     elif u == 3:
-        return np.array([[i, j, k, 0], [i, j, k, 1], [i, j, k, 2], [i, j, np.mod(k+1, d3), 0], [np.mod(i-1, d1), j, np.mod(k+1, d3), 1], [i, np.mod(j-1, d2), np.mod(k+1, d3), 2]])
+        return np.array([[i, j, k, 0], [i, j, k, 1], [i, j, k, 2], [i, j, np.mod(k-1, d3), 0], [np.mod(i+1, d1), j, np.mod(k-1, d3), 1], [i, np.mod(j-1, d2), np.mod(k+1, d3), 2]])
 
 
 dim1 = int(sys.argv[12])
@@ -29,7 +29,7 @@ h = float(sys.argv[4])*(float(sys.argv[6])-float(sys.argv[5]))/float(sys.argv[7]
 fielddir = np.array([float(sys.argv[8]),float(sys.argv[9]), float(sys.argv[10])])
 fielddir = fielddir/np.linalg.norm(fielddir)
 B = np.einsum('r, ir->i', h*fielddir,z)
-
+print(B)
 
 def flattenIndex(Indx):
     temp = np.zeros(6)
@@ -49,21 +49,21 @@ def genNN_list(d1,d2,d3):
 look_up_table = genNN_list(dim1, dim2, dim3)
 
 def HeisenbergNN(Jzz, Jpm, Jpmpm, indx1, indx2):
-    return np.array([[indx1, 0, indx1, 0, indx2, 0, indx2, 0, Jzz/8, 0],
-                     [indx1, 0, indx1, 0, indx2, 1, indx2, 1, -Jzz/8, 0],
-                     [indx1, 1, indx1, 1, indx2, 0, indx2, 0, -Jzz/8, 0],
-                     [indx1, 1, indx1, 1, indx2, 1, indx2, 1, Jzz/8, 0],
+    return np.array([[indx1, 0, indx1, 0, indx2, 0, indx2, 0, Jzz/4, 0],
+                     [indx1, 0, indx1, 0, indx2, 1, indx2, 1, -Jzz/4, 0],
+                     [indx1, 1, indx1, 1, indx2, 0, indx2, 0, -Jzz/4, 0],
+                     [indx1, 1, indx1, 1, indx2, 1, indx2, 1, Jzz/4, 0],
 
-                     [indx1, 1, indx1, 0, indx2, 0, indx2, 1, -Jpm/2, 0],
-                     [indx1, 0, indx1, 1, indx2, 1, indx2, 0, -Jpm/2, 0],
+                     [indx1, 1, indx1, 0, indx2, 0, indx2, 1, -Jpm, 0],
+                     [indx1, 0, indx1, 1, indx2, 1, indx2, 0, -Jpm, 0],
 
-                     [indx1, 1, indx1, 0, indx2, 1, indx2, 0, Jpmpm/2, 0],
-                     [indx1, 0, indx1, 1, indx2, 0, indx2, 1, Jpmpm/2, 0]])
+                     [indx1, 1, indx1, 0, indx2, 1, indx2, 0, Jpmpm, 0],
+                     [indx1, 0, indx1, 1, indx2, 0, indx2, 1, Jpmpm, 0]])
 
 def Zeeman(h, indx):
     here = h[indx % 4]
-    return np.array([[indx, 0, indx, 0, here/2, 0],
-                     [indx, 1, indx, 1, -here/2, 0]])   
+    return np.array([[indx, 0, indx, 0, -here/2, 0],
+                     [indx, 1, indx, 1, here/2, 0]])   
 
 
 interALL = []
@@ -255,7 +255,7 @@ f.write("CParaFileHead  zqp  "+"\n")
 f.write("--------------------  "+"\n")
 f.write("Nsite          {}".format(max_site)+"\n")
 f.write("Ncond          {}".format(max_site)+"\n")
-f.write("Lanczos_max    20000   "+"\n")
+f.write("Lanczos_max    1000000   "+"\n")
 f.write("initial_iv     -1    "+"\n")
 f.write("exct           {}".format(exct)+"\n")
 f.write("LanczosEps     14   "+"\n")
